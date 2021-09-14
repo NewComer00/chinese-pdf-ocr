@@ -1,3 +1,9 @@
+import os
+import sys
+project_root = os.path.dirname(os.path.abspath(__file__))
+ocrlib_path = os.path.join(project_root, 'chineseocr_lite/')
+sys.path.append(ocrlib_path)
+
 import cv2
 import numpy
 from model import OcrHandle

@@ -1,4 +1,4 @@
-opencv-python==4.5.3
+opencv-python==4.5.3.56
 numpy==1.21.2
 onnxruntime==1.8.1
 pdf2image==1.16.0

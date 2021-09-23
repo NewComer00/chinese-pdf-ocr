@@ -51,11 +51,11 @@ for idx, img in enumerate(images):
     word_sizes = word_sizes/np.linalg.norm(word_sizes)
     left_margins = left_margins/np.linalg.norm(left_margins)
     right_margins = right_margins/np.linalg.norm(right_margins)
-
     features = np.array([word_sizes,left_margins])
-    print(features)
 
     kmeans = KMeans(n_clusters=4, random_state=0).fit(features.T)
+    print(np.unique(kmeans.labels_, return_counts=True))
+    
     for idx, label in enumerate(kmeans.labels_):
         cv2.putText(output, str(label), results[idx][0][0], cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 3, cv2.LINE_AA)
 

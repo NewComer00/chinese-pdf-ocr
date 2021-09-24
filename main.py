@@ -28,7 +28,9 @@ ocr = OcrHandle()
 images = convert_from_path(pdf_path, first_page=start_page, last_page=end_page)
 for idx, img in enumerate(images):
     page = start_page + idx
-
+    
+    #TODO do OCR block by block
+    
     input = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
     results = ocr.text_predict(input, short_size=960)
 

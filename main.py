@@ -5,7 +5,7 @@ import sys
 
 import cv2
 import numpy as np
-from pdf2image import convert_from_path, convert_from_bytes
+from pdf2image import convert_from_path
 
 project_root = os.path.dirname(os.path.abspath(__file__))
 ocrlib_path = os.path.join(project_root, 'chineseocr_lite/')

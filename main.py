@@ -5,6 +5,7 @@ import sys
 
 import cv2
 import numpy as np
+import onnxruntime as ort
 from pdf2image import convert_from_path
 
 project_root = os.path.dirname(os.path.abspath(__file__))
@@ -12,6 +13,9 @@ ocrlib_path = os.path.join(project_root, 'chineseocr_lite/')
 sys.path.append(ocrlib_path)
 
 from model import OcrHandle
+
+# turn off onnxruntime warnings
+ort.set_default_logger_severity(3)
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--file", type=str, required=True)

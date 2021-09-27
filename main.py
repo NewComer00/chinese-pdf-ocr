@@ -5,7 +5,6 @@ import argparse
 
 import cv2
 import numpy as np
-from sklearn.cluster import KMeans
 from pdf2image import convert_from_path, convert_from_bytes
 
 project_root = os.path.dirname(os.path.abspath(__file__))
@@ -34,38 +33,43 @@ for idx, img in enumerate(images):
 
     output = np.array(input, copy=True)
     line_heights = np.zeros(len(results))
-    line_centers = np.zeros(len(results))
+    box_centers = np.zeros((len(results),2))
     for idx, res in enumerate(results):
         rect = np.int32(res[0])
-        line_color = random.choices(range(256), k=3)
-        cv2.polylines(output, [rect], isClosed=True, thickness=4, color=line_color)
-
+        box_centers[idx] = np.mean(rect, axis=0)
         line_heights[idx] = (rect[3][1]-rect[0][1]+rect[2][1]-rect[1][1])/2
-        line_centers[idx] = (rect[0][0]+rect[3][0]+rect[1][0]+rect[2][0])/4
+
+        # draw the OCR result boxes
+        line_color = random.choices(range(256), k=3)
+        cv2.polylines(output, [rect], isClosed=True, thickness=2, color=line_color)
     
-    # get text blocks
+    # get the contours of text contents using computer graphics algorithms
     line_ht_avg = round(np.mean(line_heights))
-    kernel = np.ones((line_ht_avg,line_ht_avg), np.uint8)
-    input = cv2.cvtColor(input, cv2.COLOR_BGR2GRAY)
-    input = cv2.GaussianBlur(input,(5,5),0)
-    _,input = cv2.threshold(input,255//3,255,cv2.THRESH_BINARY)
-    input = cv2.erode(input, kernel)
-    input = cv2.morphologyEx(input, cv2.MORPH_OPEN, kernel)
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT,(line_ht_avg,line_ht_avg))
+    gray = cv2.cvtColor(input, cv2.COLOR_BGR2GRAY)
+    blur = cv2.GaussianBlur(gray,(5,5),0)
+    _,binary = cv2.threshold(blur,255//2,255,cv2.THRESH_BINARY)
+    inverse = cv2.bitwise_not(binary)
+    dilate = cv2.dilate(inverse, kernel)
+    half_kernel = cv2.getStructuringElement(cv2.MORPH_RECT,(line_ht_avg//2,line_ht_avg//2))
+    morph_close = cv2.morphologyEx(dilate, cv2.MORPH_CLOSE, half_kernel)
+    contours, hierarchy = cv2.findContours(morph_close, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    
+    # classify the OCR results by their positions
+    labels = -np.ones(len(results),dtype=int)
+    for cont_idx, cont in enumerate(contours):
+        for label_idx in range(len(labels)):
+            # if the center of a OCR result box is inside some contour ...
+            if cv2.pointPolygonTest(cont,tuple(box_centers[label_idx]),False) >= 0:
+                labels[label_idx] = cont_idx
 
-    word_sizes = np.square(line_heights)
-    word_sizes = word_sizes/np.linalg.norm(word_sizes)
-    line_centers = line_centers/np.linalg.norm(line_centers)
-    features = np.array([word_sizes,line_centers])
-
-    kmeans = KMeans(n_clusters=4, random_state=0).fit(features.T)
-    print(np.unique(kmeans.labels_, return_counts=True))
-
-    for idx, label in enumerate(kmeans.labels_):
+    cv2.drawContours(output, contours, -1, (0, 0, 255), 3, cv2.LINE_AA)
+    for idx, label in enumerate(labels):
         cv2.putText(output, str(label), results[idx][0][0], cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 3, cv2.LINE_AA)
 
     window = "Output Page %s" % page
     cv2.namedWindow(window, cv2.WINDOW_NORMAL)
-    cv2.imshow(window, input)
+    cv2.imshow(window, output)
     while True:
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break

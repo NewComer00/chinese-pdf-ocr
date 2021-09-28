@@ -82,12 +82,27 @@ def main():
 
         page_img = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
         ocr_results = ocr.text_predict(page_img, short_size=960)
+        ocr_results = np.array(ocr_results, dtype=object)
 
         labels = classify_text(page_img, ocr_results)
 
-        for label_idx, label in enumerate(labels):
-            cv2.putText(page_img, str(label), ocr_results[label_idx][0][0], cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 3,
-                        cv2.LINE_AA)
+        results_with_label = []
+        for label_name in np.unique(labels):
+            indices = np.where(labels == label_name)
+            results_with_label.append((label_name, ocr_results[indices]))
+
+        for results_in_class in results_with_label:
+            print("\n" + "=" * 80)
+            print("Text in block %d:" % results_in_class[0])
+            for text_line in results_in_class[1][:, 1]:
+                print(text_line[4:])
+            print("=" * 80 + "\n")
+
+            points = np.vstack(results_in_class[1][:, 0]).astype(int)
+            x, y, w, h = cv2.boundingRect(points)
+            cv2.rectangle(page_img, (x, y), (x + w, y + h), (255, 0, 0), 3)
+            cv2.putText(page_img, str(results_in_class[0]), (x, y),
+                        cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 3, cv2.LINE_AA)
 
         window = "Output Page %s" % page_num
         cv2.namedWindow(window, cv2.WINDOW_NORMAL)

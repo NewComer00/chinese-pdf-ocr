@@ -1,5 +1,6 @@
 import argparse
 import os
+import pprint
 import random
 import sys
 
@@ -18,6 +19,7 @@ from model import OcrHandle
 # end of self-defined module list
 
 # presetting of the modules
+pp = pprint.PrettyPrinter(indent=4)
 ort.set_default_logger_severity(3)  # turn off onnxruntime warnings
 
 
@@ -31,7 +33,7 @@ def get_args():
     return args.file, args.start, args.end
 
 
-def classify_text(page_img, ocr_results):
+def text_cluster(page_img, ocr_results):
     output = np.array(page_img, copy=True)
     line_heights = np.zeros(len(ocr_results))
     box_centers = np.zeros((len(ocr_results), 2))
@@ -66,47 +68,64 @@ def classify_text(page_img, ocr_results):
             if cv2.pointPolygonTest(cont, tuple(box_centers[res_idx]), False) >= 0:
                 labels[res_idx] = cont_idx
 
-    # draw contours and labels of all results
-    # cv2.drawContours(output, contours, -1, (0, 0, 255), 3, cv2.LINE_AA)
-    return labels
+    labeled_results = {}
+    for label_name in np.unique(labels):
+        indices = np.where(labels == label_name)
+        labeled_results[label_name] = ocr_results[indices]
+
+    return labeled_results
+
+
+def get_labeled_text(labeled_results):
+    labeled_text = {}
+    for label_name, result in labeled_results.items():
+        text = ""
+        for text_line in result[:, 1]:
+            text += text_line[4:] + "\n"
+        labeled_text[label_name] = text
+
+    return labeled_text
+
+
+def draw_labeled_page(page_img, labeled_results):
+    out_img = page_img.copy()
+    for label_name, result in labeled_results.items():
+        points = np.vstack(result[:, 0]).astype(int)
+        x, y, w, h = cv2.boundingRect(points)
+        cv2.rectangle(out_img, (x, y), (x + w, y + h), (255, 0, 0), 3)
+        cv2.putText(out_img, str(label_name), (x, y),
+                    cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 3, cv2.LINE_AA)
+
+    return out_img
 
 
 def main():
     pdf_path, start_page, end_page = get_args()
 
     ocr = OcrHandle()
+    # read in pdf pages and transform them to images
     images = convert_from_path(pdf_path, first_page=start_page, last_page=end_page)
     for img_idx, img in enumerate(images):
         page_num = start_page + img_idx
         print("Processing page %s ..." % page_num)
 
+        # do OCR for the input page image
         page_img = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
         ocr_results = ocr.text_predict(page_img, short_size=960)
+
+        # do clustering on the ocr result
         ocr_results = np.array(ocr_results, dtype=object)
+        labeled_results = text_cluster(page_img, ocr_results)
 
-        labels = classify_text(page_img, ocr_results)
+        # group the text by their labels
+        labeled_text = get_labeled_text(labeled_results)
+        pp.pprint(labeled_text)
 
-        results_with_label = []
-        for label_name in np.unique(labels):
-            indices = np.where(labels == label_name)
-            results_with_label.append((label_name, ocr_results[indices]))
-
-        for results_in_class in results_with_label:
-            print("\n" + "=" * 80)
-            print("Text in block %d:" % results_in_class[0])
-            for text_line in results_in_class[1][:, 1]:
-                print(text_line[4:])
-            print("=" * 80 + "\n")
-
-            points = np.vstack(results_in_class[1][:, 0]).astype(int)
-            x, y, w, h = cv2.boundingRect(points)
-            cv2.rectangle(page_img, (x, y), (x + w, y + h), (255, 0, 0), 3)
-            cv2.putText(page_img, str(results_in_class[0]), (x, y),
-                        cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 3, cv2.LINE_AA)
-
+        # visualize the clustering result
+        out_img = draw_labeled_page(page_img, labeled_results)
         window = "Output Page %s" % page_num
         cv2.namedWindow(window, cv2.WINDOW_NORMAL)
-        cv2.imshow(window, page_img)
+        cv2.imshow(window, out_img)
         while True:
             if cv2.waitKey(1) & 0xFF == ord('n'):
                 break

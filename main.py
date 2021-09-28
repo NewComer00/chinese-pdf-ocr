@@ -2,6 +2,7 @@ import argparse
 import os
 import pprint
 import random
+import re
 import sys
 
 import cv2
@@ -34,17 +35,12 @@ def get_args():
 
 
 def text_cluster(page_img, ocr_results):
-    output = np.array(page_img, copy=True)
     line_heights = np.zeros(len(ocr_results))
     box_centers = np.zeros((len(ocr_results), 2))
     for idx, res in enumerate(ocr_results):
         rect = np.int32(res[0])
         box_centers[idx] = np.mean(rect, axis=0)
         line_heights[idx] = (rect[3][1] - rect[0][1] + rect[2][1] - rect[1][1]) / 2
-
-        # draw the OCR result boxes
-        line_color = random.choices(range(256), k=3)
-        cv2.polylines(output, [rect], isClosed=True, thickness=2, color=line_color)
 
     # get the contours of text contents using computer graphics algorithms
     line_ht_avg = round(np.mean(line_heights))
@@ -60,7 +56,7 @@ def text_cluster(page_img, ocr_results):
     morph_close = cv2.morphologyEx(dilate, cv2.MORPH_CLOSE, half_kernel)
     contours, hierarchy = cv2.findContours(morph_close, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-    # classify the OCR results by their positions
+    # do OCR results clustering by their positions
     labels = -np.ones(len(ocr_results), dtype=int)
     for cont_idx, cont in enumerate(contours):
         for res_idx, res in enumerate(ocr_results):
@@ -81,7 +77,8 @@ def get_labeled_text(labeled_results):
     for label_name, result in labeled_results.items():
         text = ""
         for text_line in result[:, 1]:
-            text += text_line[4:] + "\n"
+            text += re.sub(r"^(\d+、\s)", "", text_line)
+            text += "\n"
         labeled_text[label_name] = text
 
     return labeled_text
@@ -90,11 +87,16 @@ def get_labeled_text(labeled_results):
 def draw_labeled_page(page_img, labeled_results):
     out_img = page_img.copy()
     for label_name, result in labeled_results.items():
+        label_color = random.choices(range(256), k=3)
+        for ocr_region in result[:, 0]:
+            cv2.polylines(out_img, np.int32([ocr_region]),
+                          isClosed=True, thickness=2, color=label_color)
+
         points = np.vstack(result[:, 0]).astype(int)
         x, y, w, h = cv2.boundingRect(points)
-        cv2.rectangle(out_img, (x, y), (x + w, y + h), (255, 0, 0), 3)
+        cv2.rectangle(out_img, (x, y), (x + w, y + h), label_color, 3)
         cv2.putText(out_img, str(label_name), (x, y),
-                    cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 3, cv2.LINE_AA)
+                    cv2.FONT_HERSHEY_SIMPLEX, 1, label_color, 4, cv2.LINE_AA)
 
     return out_img
 
@@ -102,8 +104,11 @@ def draw_labeled_page(page_img, labeled_results):
 def main():
     pdf_path, start_page, end_page = get_args()
 
+    print("Initializing OCR model...")
     ocr = OcrHandle()
+
     # read in pdf pages and transform them to images
+    print("Loading page(s) from PDF file...")
     images = convert_from_path(pdf_path, first_page=start_page, last_page=end_page)
     for img_idx, img in enumerate(images):
         page_num = start_page + img_idx

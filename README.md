@@ -6,7 +6,7 @@
 
 ## 用法
 ### 安装poppler
-用于PDF转图片，被Python的[pdf2image](https://github.com/Belval/pdf2image)包使用。各平台的[安装方法](https://github.com/Belval/pdf2image#how-to-install)。
+用于PDF转图片，被Python的[pdf2image](https://github.com/Belval/pdf2image)包使用。各平台的[安装方法](https://github.com/Belval/pdf2image#windows)。
 
 ### 安装Python依赖包
 ```

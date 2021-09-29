@@ -8,3 +8,4 @@ python3 main.py --file <path of your PDF file> --start <page number to start OCR
 ```
 
 ## Demo
+![demo](assets/demo.png)

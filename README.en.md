@@ -6,7 +6,7 @@ OCR for Chinese PDF file using the API from [DayBreak-u/chineseocr\_lite](https:
 
 ## Usage
 ### Install poppler
-Poppler is needed by Python package [pdf2image](https://github.com/Belval/pdf2image) to transform PDF page into image. [Ways to install](https://github.com/Belval/pdf2image#how-to-install).
+Poppler is needed by Python package [pdf2image](https://github.com/Belval/pdf2image) to transform PDF page into image. [Ways to install](https://github.com/Belval/pdf2image#windows).
 
 ### Install Python requirements
 ```

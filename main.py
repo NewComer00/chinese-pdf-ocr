@@ -1,6 +1,5 @@
 import argparse
 import os
-import pprint
 import random
 import re
 import sys
@@ -20,7 +19,6 @@ from model import OcrHandle
 # end of self-defined module list
 
 # presetting of the modules
-pp = pprint.PrettyPrinter(indent=4)
 ort.set_default_logger_severity(3)  # turn off onnxruntime warnings
 
 
@@ -58,6 +56,7 @@ def text_cluster(page_img, ocr_results):
 
     # do OCR results clustering by their positions
     labels = -np.ones(len(ocr_results), dtype=int)
+    contours.reverse() # from the upper parts of the page to the lower parts
     for cont_idx, cont in enumerate(contours):
         for res_idx, res in enumerate(ocr_results):
             # if the center of a OCR result box is inside some contour ...
@@ -124,7 +123,8 @@ def main():
 
         # group the text by their labels
         labeled_text = get_labeled_text(labeled_results)
-        pp.pprint(labeled_text)
+        for label, text in labeled_text.items():
+            print("<%d>\n%s" % (label, text))
 
         # visualize the clustering result
         out_img = draw_labeled_page(page_img, labeled_results)

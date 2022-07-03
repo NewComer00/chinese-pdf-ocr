@@ -4,10 +4,14 @@ var pdfjsLib = window['pdfjs-dist/build/pdf'];
 // The workerSrc property shall be specified.
 pdfjsLib.GlobalWorkerOptions.workerSrc = '//mozilla.github.io/pdf.js/build/pdf.worker.js';
 
+// the minimum displayed edge length of the PDF page
+const SHORT_EDGE_MINLEN = 960;
+
 var pdfDoc = null,
     pageNum = 1,
     pageRendering = false,
-    pageNumPending = null,
+    pageNumPending = null
+    scale = 1,
     canvas = document.getElementById('the-canvas'),
     ctx = canvas.getContext('2d'),
     ocrCanvas = new fabric.Canvas('ocr-layer');
@@ -20,8 +24,18 @@ function renderPage(num) {
   pageRendering = true;
   // Using promise to fetch the page
   pdfDoc.getPage(num).then(function(page) {
-    var scale = document.getElementById(
-      "canvas-layers").offsetWidth / page.getViewport({scale: 1}).width;
+    // scale the page if too small
+    var original_page_width = page.getViewport({scale: 1}).width;
+    var original_page_height = page.getViewport({scale: 1}).height;
+    if (original_page_width <= original_page_height) {
+      scale = Math.max(
+        SHORT_EDGE_MINLEN,
+        document.getElementById("canvas-layers").offsetWidth
+        ) / original_page_width;
+    } else {
+      scale = SHORT_EDGE_MINLEN / Math.min(
+        SHORT_EDGE_MINLEN, original_page_height);
+    }
     var viewport = page.getViewport({scale: scale});
     canvas.height = viewport.height;
     canvas.width = viewport.width;

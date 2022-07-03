@@ -95,18 +95,3 @@ class PdfOcrTool:
 
             labeled_textbox[label_name] = (bounding_box, text)
         return labeled_textbox
-
-    def _draw_labeled_page(self, page_img, labeled_results):
-        out_img = page_img.copy()
-        for label_name, result in labeled_results.items():
-            label_color = random.choices(range(256), k=3)
-            for ocr_region in result[:, 0]:
-                cv2.polylines(out_img, np.int32([ocr_region]),
-                              isClosed=True, thickness=2, color=label_color)
-
-            points = np.vstack(result[:, 0]).astype(int)
-            x, y, w, h = cv2.boundingRect(points)
-            cv2.rectangle(out_img, (x, y), (x + w, y + h), label_color, 3)
-            cv2.putText(out_img, label_name, (x, y),
-                        cv2.FONT_HERSHEY_SIMPLEX, 1, label_color, 4, cv2.LINE_AA)
-        return out_img

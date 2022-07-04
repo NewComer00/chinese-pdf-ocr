@@ -2,11 +2,12 @@ import os
 import sys
 import base64
 import json
+
 import cv2
 import numpy as np
 from flask import Flask, render_template, redirect, url_for, request, make_response
 
-# self-defined modules to be added th PYTHONPATH
+# self-defined modules to be added to PYTHONPATH
 project_root = os.path.dirname(os.path.abspath(__file__)) + '/..'
 sys.path.append(project_root)
 from pdfocr import PdfOcrTool
@@ -16,7 +17,6 @@ app = Flask(__name__)
 ocr = PdfOcrTool()
 
 
-# the minimal Flask application
 @app.route('/', methods=['GET', 'POST'])
 def index():
     # get the image of the current pdf page

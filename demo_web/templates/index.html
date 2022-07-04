@@ -14,7 +14,7 @@
     <title>Chinese PDF OCR</title>
   </head>
   <body>
-    <div class="container justify-content-center fixed-top p-1" id="top-banner">
+    <div id="top-banner" class="container justify-content-center fixed-top p-1">
       <div class="row">
         <div class="col-2">
           <label for="file" class="custom-file-upload">
@@ -37,14 +37,14 @@
       </div>
     </div>
 
-    <div class="d-flex justify-content-center mt-5" id="alert-flex-container">
+    <div id="alert-flex-container" class="d-flex justify-content-center mt-5">
     </div>
 
     <div id="main" class="container justify-content-center mt-5">
       <div class="row">
         <div class="col">
           <div id="canvas-layers" class="container w-100 p-0">
-            <canvas id="the-canvas"></canvas>
+            <canvas id="pdf-layer"></canvas>
             <canvas id="ocr-layer"></canvas>
           </div>
         </div>

@@ -27,7 +27,7 @@ input[type="file"] {
   position: relative;
 }
 
-#the-canvas {
+#pdf-layer {
   position: absolute;
   left: 0;
   top: 0;

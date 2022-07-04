@@ -9,13 +9,11 @@ import numpy as np
 import onnxruntime as ort
 from pdf2image import convert_from_path
 
-# self-defined modules to be added th PYTHONPATH
+# self-defined modules to be added to PYTHONPATH
 project_root = os.path.dirname(os.path.abspath(__file__))
 ocrlib_path = os.path.join(project_root, 'chineseocr_lite/')
 sys.path.append(ocrlib_path)
-
 from model import OcrHandle
-
 # end of self-defined module list
 
 # presetting of the modules
@@ -23,11 +21,16 @@ ort.set_default_logger_severity(3)  # turn off onnxruntime warnings
 
 
 class PdfOcrTool:
+
     def __init__(self):
         print("Initializing OCR model...")
         self.ocr_model = OcrHandle()
 
+    # input
     # page_img: cv2 BGR image
+    # output
+    # labeled_textbox:
+    # { label_name: (bounding box, text) }
     def predict(self, page_img):
         print("Performing OCR on page ...")
         # do OCR for the input page image
@@ -48,12 +51,15 @@ class PdfOcrTool:
         for idx, res in enumerate(ocr_results):
             rect = np.int32(res[0])
             box_centers[idx] = np.mean(rect, axis=0)
-            line_heights[idx] = (rect[3][1] - rect[0][1] + rect[2][1] - rect[1][1]) / 2
+            line_heights[idx] = (rect[3][1] - rect[0][1] + rect[2][1] -
+                                 rect[1][1]) / 2
 
         # get the contours of text contents using computer graphics algorithms
         line_ht_avg = round(np.mean(line_heights))
-        kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (line_ht_avg, line_ht_avg))
-        half_kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (line_ht_avg // 2, line_ht_avg // 2))
+        kernel = cv2.getStructuringElement(cv2.MORPH_RECT,
+                                           (line_ht_avg, line_ht_avg))
+        half_kernel = cv2.getStructuringElement(
+            cv2.MORPH_RECT, (line_ht_avg // 2, line_ht_avg // 2))
 
         gray = cv2.cvtColor(page_img, cv2.COLOR_BGR2GRAY)
         blur = cv2.GaussianBlur(gray, (5, 5), 0)
@@ -62,15 +68,18 @@ class PdfOcrTool:
 
         dilate = cv2.dilate(inverse, kernel)
         morph_close = cv2.morphologyEx(dilate, cv2.MORPH_CLOSE, half_kernel)
-        contours, hierarchy = cv2.findContours(morph_close, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        contours, hierarchy = cv2.findContours(morph_close, cv2.RETR_EXTERNAL,
+                                               cv2.CHAIN_APPROX_SIMPLE)
 
         # do OCR results clustering by their positions
         labels = -np.ones(len(ocr_results), dtype=int)
-        contours.reverse() # from the upper parts of the page to the lower parts
+        contours.reverse(
+        )  # from the upper parts of the page to the lower parts
         for cont_idx, cont in enumerate(contours):
             for res_idx, res in enumerate(ocr_results):
                 # if the center of a OCR result box is inside some contour ...
-                if cv2.pointPolygonTest(cont, tuple(box_centers[res_idx]), False) >= 0:
+                if cv2.pointPolygonTest(cont, tuple(box_centers[res_idx]),
+                                        False) >= 0:
                     labels[res_idx] = cont_idx
 
         labeled_results = {}

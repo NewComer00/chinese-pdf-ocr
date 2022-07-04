@@ -5,15 +5,15 @@
 OCR for Chinese PDF file using the API from [DayBreak-u/chineseocr\_lite](https://github.com/DayBreak-u/chineseocr_lite).
 
 ## Project directory structure
-- ````chineseocr_lite/````
+- ```chineseocr_lite/```  
 Forked from the lightweight Chinese OCR model implemented by [DayBreak-u/chineseocr\_lite](https://github.com/DayBreak-u/chineseocr_lite).
-- ```pdfocr.py```
+- ```pdfocr.py```  
 The core logic of OCR on PDF files. First perform OCR on a certain page of the PDF, use a graphics algorithm to divide the PDF page into paragraphs based on the recognition results, and finally combine the OCR results by paragraphs.
-- ````requirements.txt```
+- ```requirements.txt```  
 The Python packages required by ```chineseocr_lite/``` and ```pdfocr.py```.
-- ````demo_gui/````
+- ```demo_gui/```  
 A simple demo program. Perform OCR on several pages of a given PDF, then output the results to the terminal, and visualize the OCR results of the current page in a new window.
-- ```demo_web/```
+- ```demo_web/```  
 A web application that runs on a browser. You can open the PDF on the web page for OCR, and click the recognition result to copy the OCR text to the clipboard.
 
 ## Install basic dependencies

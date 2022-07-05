@@ -1375,7 +1375,7 @@ async function _fetchDocument(worker, source, pdfDataRangeTransport, docId) {
 
   const workerId = await worker.messageHandler.sendWithPromise("GetDocRequest", {
     docId,
-    apiVersion: '2.15.214',
+    apiVersion: '2.15.220',
     source: {
       data: source.data,
       url: source.url,
@@ -3517,9 +3517,9 @@ class InternalRenderTask {
 
 }
 
-const version = '2.15.214';
+const version = '2.15.220';
 exports.version = version;
-const build = '03c6febc4';
+const build = 'a1ac1a61b';
 exports.build = build;
 
 /***/ }),
@@ -10945,7 +10945,7 @@ class FreeTextEditor extends _editor.AnnotationEditor {
   }
 
   static initialize(l10n) {
-    this._l10nPromise = l10n.get("freetext_default_content");
+    this._l10nPromise = l10n.get("free_text_default_content");
     const style = getComputedStyle(document.documentElement);
     this._internalPadding = parseFloat(style.getPropertyValue("--freetext-padding"));
   }
@@ -14376,8 +14376,7 @@ class FileAttachmentAnnotationElement extends AnnotationElement {
   render() {
     this.container.className = "fileAttachmentAnnotation";
     const trigger = document.createElement("div");
-    trigger.style.height = this.container.style.height;
-    trigger.style.width = this.container.style.width;
+    trigger.className = "popupTriggerArea";
     trigger.addEventListener("dblclick", this._download.bind(this));
 
     if (!this.data.hasPopup && (this.data.titleObj?.str || this.data.contentsObj?.str || this.data.richText)) {
@@ -14396,10 +14395,16 @@ class FileAttachmentAnnotationElement extends AnnotationElement {
 
 class AnnotationLayer {
   static render(parameters) {
+    const {
+      annotations,
+      div,
+      viewport
+    } = parameters;
+    this.#setDimensions(div, viewport);
     const sortedAnnotations = [],
           popupAnnotations = [];
 
-    for (const data of parameters.annotations) {
+    for (const data of annotations) {
       if (!data) {
         continue;
       }
@@ -14425,14 +14430,12 @@ class AnnotationLayer {
       sortedAnnotations.push(...popupAnnotations);
     }
 
-    const div = parameters.div;
-
     for (const data of sortedAnnotations) {
       const element = AnnotationElementFactory.create({
         data,
         layer: div,
         page: parameters.page,
-        viewport: parameters.viewport,
+        viewport,
         linkService: parameters.linkService,
         downloadManager: parameters.downloadManager,
         imageResourcesPath: parameters.imageResourcesPath || "",
@@ -14474,13 +14477,15 @@ class AnnotationLayer {
   static update(parameters) {
     const {
       annotationCanvasMap,
-      div
+      div,
+      viewport
     } = parameters;
+    this.#setDimensions(div, viewport);
     this.#setAnnotationCanvasMap(div, annotationCanvasMap);
     div.hidden = false;
   }
 
-  static setDimensions(div, {
+  static #setDimensions(div, {
     width,
     height,
     rotation
@@ -19030,8 +19035,8 @@ var _svg = __w_pdfjs_require__(30);
 
 var _xfa_layer = __w_pdfjs_require__(28);
 
-const pdfjsVersion = '2.15.214';
-const pdfjsBuild = '03c6febc4';
+const pdfjsVersion = '2.15.220';
+const pdfjsBuild = 'a1ac1a61b';
 {
   if (_is_node.isNodeJS) {
     const {

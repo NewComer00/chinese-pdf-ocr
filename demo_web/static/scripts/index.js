@@ -1,8 +1,12 @@
 // Loaded via <script> tag, create shortcut to access PDF.js exports.
 var pdfjsLib = window['pdfjs-dist/build/pdf'];
 
-// The workerSrc property shall be specified.
-pdfjsLib.GlobalWorkerOptions.workerSrc = '//mozilla.github.io/pdf.js/build/pdf.worker.js';
+/**
+ * TODO
+ * pdf.js seems to automatically find my local pdf-xxx.worker.js
+ * maybe we don't need to specify workerSrc manually?
+ */
+//pdfjsLib.GlobalWorkerOptions.workerSrc = ;
 
 // the minimum displayed edge length of the PDF page
 const SHORT_EDGE_MINLEN = 960;

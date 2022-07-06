@@ -1,8 +1,10 @@
-[![en](https://img.shields.io/badge/README-en-red.svg)](./README.md)
+[![zh](https://img.shields.io/badge/README-zh-red.svg)](./README.md)
 [![en](https://img.shields.io/badge/README-en-gre.svg)](./README.en.md)
 
 # chinese-pdf-ocr
-OCR for Chinese PDF file using the API from [DayBreak-u/chineseocr\_lite](https://github.com/DayBreak-u/chineseocr_lite).
+OCR for Chinese PDF file using the API from [DayBreak-u/chineseocr\_lite](https://github.com/DayBreak-u/chineseocr_lite).  
+> <img src="assets/demo.png" alt="assets/demo.png" width="40%" height="40%">
+> <img src="assets/demo_web.png" alt="assets/demo_web.png" width="40%" height="40%">
 
 ## Project directory structure
 - ```chineseocr_lite/```  

@@ -1,2 +1,4 @@
-chineseocr_lite/* linguist-vendored
+chineseocr_lite/** linguist-vendored
+demo_web/static/scripts/vendor/** linguist-vendored
+demo_web/static/styles/vendor/** linguist-vendored
 assets/*.png filter=lfs diff=lfs merge=lfs -text

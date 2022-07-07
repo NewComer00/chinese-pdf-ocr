@@ -2,7 +2,9 @@
 [![en](https://img.shields.io/badge/README-en-gre.svg)](./README.en.md)
 
 # chinese-pdf-ocr
-对中文PDF文件进行OCR。使用了[DayBreak-u/chineseocr\_lite](https://github.com/DayBreak-u/chineseocr_lite)的OCR模型。
+对中文PDF文件进行OCR。使用了[DayBreak-u/chineseocr\_lite](https://github.com/DayBreak-u/chineseocr_lite)的OCR模型。  
+> <img src="assets/demo.png" alt="assets/demo.png" width="40%" height="40%">
+> <img src="assets/demo_web.png" alt="assets/demo_web.png" width="40%" height="40%">
 
 ## 项目目录结构
 - ```chineseocr_lite/```  

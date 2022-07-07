@@ -81,5 +81,5 @@ app.run(host='0.0.0.0', port=<port number>)
 This service uses the web server that comes with Flask. This server is for development use only and cannot be used in an actual production environment. If you want to publish the service on the public network, you can refer to my other project(in Chinese) [NJUST_HomeworkCollector](https://github.com/NewComer00/NJUST_HomeworkCollector).
 
 ### Demo
-After opening the webpage, first click the ```Upload PDF``` button in the upper left corner to upload the PDF file to the local browser. Then click the ```Previous``` or ```Next``` button to switch the PDF page. Finally, click the ```OCR``` button in the upper right corner to perform OCR on the current page. The recognized text will be marked by a red box, click the corresponding box to copy the text.
+After opening the webpage, first click the ```Upload PDF``` button in the upper left corner to upload the PDF file to the local browser. Then click the ```Previous``` or ```Next``` button to switch the PDF page. Finally, click the ```OCR``` button in the upper right corner to perform OCR on the current page. The recognized text will be marked by a red box, click the corresponding box to copy the text. Double click on the page number after ```Page:``` to jump to a specified page.
 ![web rendering](assets/demo_web.png)

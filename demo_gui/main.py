@@ -28,7 +28,7 @@ def main():
     pdf_path, start_page, end_page = get_args()
 
     # init pdf ocr tool
-    ocr = PdfOcrTool()
+    ocr = PdfOcrTool(newline="\n")
 
     # read in pdf pages and transform them to images
     print("Loading page(s) from PDF file...")

@@ -98,6 +98,8 @@ function onPrevPage() {
     ocrCanvas.clear();
     pageNum--;
     queueRenderPage(pageNum);
+    // scroll to top
+    $('html,body').scrollTop(0);
 }
 document.getElementById('prev').addEventListener('click', onPrevPage);
 
@@ -111,6 +113,8 @@ function onNextPage() {
     ocrCanvas.clear();
     pageNum++;
     queueRenderPage(pageNum);
+    // scroll to top
+    $('html,body').scrollTop(0);
 }
 document.getElementById('next').addEventListener('click', onNextPage);
 
@@ -192,3 +196,55 @@ document.getElementById('file').onchange = function(event) {
     }
     fileReader.readAsArrayBuffer(file);
 }
+
+//plugin to make current page text editable
+$.fn.extend({
+    editable: function () {
+        $(this).each(function () {
+            var $el = $(this),
+            $edittextbox = $('<input type="text"></input>').css('min-width', $el.width()),
+            submitChanges = function () {
+                if ($edittextbox.val() !== '') {
+                    $el.html($edittextbox.val());
+                    $el.show();
+                    $el.trigger('editsubmit', [$el.html()]);
+                    $(document).unbind('click', submitChanges);
+                    $edittextbox.detach();
+                }
+            },
+            tempVal;
+            $edittextbox.click(function (event) {
+                event.stopPropagation();
+            });
+
+            $el.dblclick(function (e) {
+                tempVal = $el.html();
+                $edittextbox.val(tempVal).insertBefore(this)
+                .bind('keypress', function (e) {
+                    var code = (e.keyCode ? e.keyCode : e.which);
+                    if (code == 13) {
+                        submitChanges();
+                    }
+                }).select();
+                $el.hide();
+                $(document).click(submitChanges);
+            });
+        });
+        return this;
+    }
+});
+
+// double click page number to change the current page
+$('#page_num').editable().on('editsubmit', function (event, val) {
+    var num = parseInt(val);
+    // if input is legal...
+    if (!isNaN(num) && num > 0 && num <= pdfDoc.numPages) {
+        ocrCanvas.clear();
+        pageNum = num;
+        queueRenderPage(pageNum);
+        $('html,body').scrollTop(0);
+    } else {
+        // if illegal, keep the page number unchanged
+        document.getElementById('page_num').textContent = pageNum;
+    }
+});

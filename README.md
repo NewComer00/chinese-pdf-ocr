@@ -81,5 +81,5 @@ app.run(host='0.0.0.0', port=<端口号>)
 本服务使用了Flask自带的网页服务器。该服务器仅供开发使用，不能在实际生产环境中使用。如需将服务发布在公网，可以参考我的另一个项目[NJUST_HomeworkCollector](https://github.com/NewComer00/NJUST_HomeworkCollector)。
 
 ### 效果图
-打开网页后，先点击左上角的```Upload PDF```按钮上传PDF文件到本机浏览器。然后点击```Previous```或```Next```按钮切换PDF上/下页。最后点击右上角的```OCR```按钮，对当前页进行OCR。识别到的文本会由红框标出，点击对应的方框即可复制其中的文字。
+打开网页后，先点击左上角的```Upload PDF```按钮上传PDF文件到本机浏览器。然后点击```Previous```或```Next```按钮切换PDF上/下页。最后点击右上角的```OCR```按钮，对当前页进行OCR。识别到的文本会由红框标出，点击对应的方框即可复制其中的文字。双击```Page:```后的当前页码，可以编辑并跳转到指定页。
 ![web效果图](assets/demo_web.png)

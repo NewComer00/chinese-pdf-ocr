@@ -22,9 +22,12 @@ ort.set_default_logger_severity(3)  # turn off onnxruntime warnings
 
 class PdfOcrTool:
 
-    def __init__(self):
+    # input
+    # newline: the newline character between each two ocr text lines
+    def __init__(self, newline=""):
         print("Initializing OCR model...")
         self.ocr_model = OcrHandle()
+        self.newline = newline
 
     # input
     # page_img: cv2 BGR image
@@ -100,7 +103,7 @@ class PdfOcrTool:
             text = ""
             for text_line in result[:, 1]:
                 text += re.sub(r"^(\d+、\s)", "", text_line)
-                text += "\n"
+                text += self.newline
 
             labeled_textbox[label_name] = (bounding_box, text)
         return labeled_textbox

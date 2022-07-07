@@ -29,7 +29,20 @@
           <button id="next" type="button" class="btn btn-primary w-75">🔽 Next</button>
         </div>
         <div class="col-2">
-          <span>Page: <span id="page_num"></span> / <span id="page_count"></span></span>
+            <div class="row row-cols-sm-auto">
+                <div class="col">
+                Page:
+                </div>
+                <div class="col">
+                    <span id="page_num"></span>
+                </div>
+                <div class="col">
+                /
+                </div>
+                <div class="col">
+                    <span id="page_count"></span>
+                </div>
+            </div>
         </div>
         <div class="col-2">
           <button id="do-ocr" type="button" class="btn btn-primary w-100">📖🔍 OCR</button>

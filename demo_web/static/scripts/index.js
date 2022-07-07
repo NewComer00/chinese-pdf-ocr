@@ -239,10 +239,13 @@ $('#page_num').editable().on('editsubmit', function (event, val) {
     var num = parseInt(val);
     // if input is legal...
     if (!isNaN(num) && num > 0 && num <= pdfDoc.numPages) {
-        ocrCanvas.clear();
-        pageNum = num;
-        queueRenderPage(pageNum);
-        $('html,body').scrollTop(0);
+        // only act when page number is really changed
+        if (num != pageNum) {
+            ocrCanvas.clear();
+            pageNum = num;
+            queueRenderPage(pageNum);
+            $('html,body').scrollTop(0);
+        }
     } else {
         // if illegal, keep the page number unchanged
         document.getElementById('page_num').textContent = pageNum;

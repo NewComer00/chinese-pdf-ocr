@@ -14,8 +14,12 @@ input[type="file"] {
   background-color: #fff;
 }
 
+#page_num {
+    cursor: url('/static/images/double-tap.png'), auto;
+}
+
 #alert-flex-container {
-  position:fixed;
+  position: fixed;
   top: 0px;
   left: 0px;
   width: 100%;

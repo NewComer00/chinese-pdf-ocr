@@ -164,7 +164,11 @@ function onDoOcr() {
 
         // if we click the textbox, copy the ocr text to clipboard
         rect.on('mouseup', function() {
-            navigator.clipboard.writeText(this.text);
+            if (window.isSecureContext && navigator.clipboard) {
+                navigator.clipboard.writeText(this.text);
+            } else {
+                unsecuredCopyToClipboard(this.text);
+            }
             document.getElementById('alert-flex-container').appendChild(textCopiedAlert.render());
             // to correctly select the overlapped object
             ocrCanvas.discardActiveObject();
@@ -175,6 +179,24 @@ function onDoOcr() {
     }
 }
 document.getElementById('do-ocr').addEventListener('click', onDoOcr);
+
+/**
+ * Perform clipboard copying in the unsecure contexts
+ * https://stackoverflow.com/a/71876238
+ */
+function unsecuredCopyToClipboard(text) {
+  const textArea = document.createElement("textarea");
+  textArea.value = text;
+  document.body.appendChild(textArea);
+  textArea.focus();
+  textArea.select();
+  try {
+    document.execCommand('copy');
+  } catch (err) {
+    console.error('Unable to copy to clipboard', err);
+  }
+  document.body.removeChild(textArea);
+}
 
 /**
  * Asynchronously downloads PDF.

@@ -7,7 +7,6 @@ import sys
 import cv2
 import numpy as np
 import onnxruntime as ort
-from pdf2image import convert_from_path
 
 # self-defined modules to be added to PYTHONPATH
 project_root = os.path.dirname(os.path.abspath(__file__))

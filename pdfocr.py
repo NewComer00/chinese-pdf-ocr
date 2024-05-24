@@ -55,38 +55,43 @@ class PdfOcrTool:
                                  rect[1][1]) / 2
 
         # get the contours of text contents using computer graphics algorithms
-        line_ht_avg = round(np.mean(line_heights))
-        kernel = cv2.getStructuringElement(cv2.MORPH_RECT,
-                                           (line_ht_avg, line_ht_avg))
-        half_kernel = cv2.getStructuringElement(
-            cv2.MORPH_RECT, (line_ht_avg // 2, line_ht_avg // 2))
+        
+        ## if no text detected, return empty dict
+        try:
+            line_ht_avg = round(np.mean(line_heights))
+            kernel = cv2.getStructuringElement(cv2.MORPH_RECT,
+                                            (line_ht_avg, line_ht_avg))
+            half_kernel = cv2.getStructuringElement(
+                cv2.MORPH_RECT, (line_ht_avg // 2, line_ht_avg // 2))
 
-        gray = cv2.cvtColor(page_img, cv2.COLOR_BGR2GRAY)
-        blur = cv2.GaussianBlur(gray, (5, 5), 0)
-        _, binary = cv2.threshold(blur, 255 // 2, 255, cv2.THRESH_BINARY)
-        inverse = cv2.bitwise_not(binary)
+            gray = cv2.cvtColor(page_img, cv2.COLOR_BGR2GRAY)
+            blur = cv2.GaussianBlur(gray, (5, 5), 0)
+            _, binary = cv2.threshold(blur, 255 // 2, 255, cv2.THRESH_BINARY)
+            inverse = cv2.bitwise_not(binary)
 
-        dilate = cv2.dilate(inverse, kernel)
-        morph_close = cv2.morphologyEx(dilate, cv2.MORPH_CLOSE, half_kernel)
-        contours, hierarchy = cv2.findContours(morph_close, cv2.RETR_EXTERNAL,
-                                               cv2.CHAIN_APPROX_SIMPLE)
+            dilate = cv2.dilate(inverse, kernel)
+            morph_close = cv2.morphologyEx(dilate, cv2.MORPH_CLOSE, half_kernel)
+            contours, hierarchy = cv2.findContours(morph_close, cv2.RETR_EXTERNAL,
+                                                cv2.CHAIN_APPROX_SIMPLE)
 
-        # do OCR results clustering by their positions
-        labels = -np.ones(len(ocr_results), dtype=int)
-        contours.reverse(
-        )  # from the upper parts of the page to the lower parts
-        for cont_idx, cont in enumerate(contours):
-            for res_idx, res in enumerate(ocr_results):
-                # if the center of a OCR result box is inside some contour ...
-                if cv2.pointPolygonTest(cont, tuple(box_centers[res_idx]),
-                                        False) >= 0:
-                    labels[res_idx] = cont_idx
+            # do OCR results clustering by their positions
+            labels = -np.ones(len(ocr_results), dtype=int)
+            contours.reverse(
+            )  # from the upper parts of the page to the lower parts
+            for cont_idx, cont in enumerate(contours):
+                for res_idx, res in enumerate(ocr_results):
+                    # if the center of a OCR result box is inside some contour ...
+                    if cv2.pointPolygonTest(cont, tuple(box_centers[res_idx]),
+                                            False) >= 0:
+                        labels[res_idx] = cont_idx
 
-        labeled_results = {}
-        for label_name in np.unique(labels):
-            indices = np.where(labels == label_name)
-            labeled_results[str(label_name)] = ocr_results[indices]
-        return labeled_results
+            labeled_results = {}
+            for label_name in np.unique(labels):
+                indices = np.where(labels == label_name)
+                labeled_results[str(label_name)] = ocr_results[indices]
+            return labeled_results
+        except:
+            return {}
 
     # output: labeled_textbox
     # { label_name: (bounding box, text) }

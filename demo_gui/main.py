@@ -16,16 +16,21 @@ from pdfocr import PdfOcrTool
 
 def get_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--file", type=str, required=True)
-    parser.add_argument("--start", type=int, required=True)
-    parser.add_argument("--end", type=int, required=True)
+    parser.add_argument("-f", "--file", type=str, required=True,
+                        help="PDF file path")
+    parser.add_argument("-s", "--start", type=int, required=True,
+                        help="the first page for OCR")
+    parser.add_argument("-e", "--end", type=int, required=True,
+                        help="the last page for OCR")
+    parser.add_argument('-t', '--text-only', action='store_true',
+                        help="print text to stdout only; do not show images")
     args = parser.parse_args()
 
-    return args.file, args.start, args.end
+    return args.file, args.start, args.end, args.text_only
 
 
 def main():
-    pdf_path, start_page, end_page = get_args()
+    pdf_path, start_page, end_page, text_only = get_args()
 
     # init pdf ocr tool
     ocr = PdfOcrTool(newline="\n")
@@ -44,18 +49,22 @@ def main():
         labeled_textbox = ocr.predict(page_img)
 
         # visualize the OCR and clustering result
-        for label, textbox in labeled_textbox.items():
-            print("<%s>\n%s" % (label, textbox[1]))
-            label_color = random.choices(range(256), k=3)
-            x, y, w, h = textbox[0]
-            cv2.rectangle(page_img, (x, y), (x + w, y + h), label_color, 3)
-            cv2.putText(page_img, label, (x, y), cv2.FONT_HERSHEY_SIMPLEX, 1,
-                        label_color, 4, cv2.LINE_AA)
+        if text_only:
+            for label, textbox in labeled_textbox.items():
+                print("<%s>\n%s" % (label, textbox[1]))
+        else:
+            for label, textbox in labeled_textbox.items():
+                print("<%s>\n%s" % (label, textbox[1]))
+                label_color = random.choices(range(256), k=3)
+                x, y, w, h = textbox[0]
+                cv2.rectangle(page_img, (x, y), (x + w, y + h), label_color, 3)
+                cv2.putText(page_img, label, (x, y), cv2.FONT_HERSHEY_SIMPLEX, 1,
+                            label_color, 4, cv2.LINE_AA)
 
-        window = "Output Page %s" % page_num
-        cv2.namedWindow(window, cv2.WINDOW_NORMAL)
-        cv2.imshow(window, page_img)
-        cv2.waitKey(0)
+            window = "Output Page %s" % page_num
+            cv2.namedWindow(window, cv2.WINDOW_NORMAL)
+            cv2.imshow(window, page_img)
+            cv2.waitKey(0)
 
 
 if __name__ == "__main__":

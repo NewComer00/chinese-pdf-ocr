@@ -50,14 +50,26 @@ pip3 install -r requirements.txt
 ```
 
 ### Run the main program
+```shell
+python3 main.py --file <path_to_PDF_file> --start <OCR_start_page> --end <OCR_end_page> [--text-only]
 ```
-python3 main.py --file <PDF file path> --start <start page num> --end <end page num>
-```
-**📘 Example**
-Perform OCR on the ```1.pdf``` file in the current directory, with page numbers starting from ```150``` and ending at ```155```.
-```
-python3 main.py --file ./1.pdf --start 150 --end 155
-```
+
+> **📘 Example**
+> 
+> View help information
+> ```shell
+> python3 main.py -h
+> ```
+> 
+> Perform OCR on the `1.pdf` file in the current directory, starting from page `150` to page `155`. Print the recognized text to the terminal and display the results as images.
+> ```shell
+> python3 main.py --file ./1.pdf --start 150 --end 155
+> ```
+> 
+> Only print the recognized text to the terminal, without displaying the result images.
+> ```shell
+> python3 main.py --file ./1.pdf --start 150 --end 155 --text-only
+> ```
 
 ### Demo
 Click on the recognized image, and then press any key on the keyboard to recognize the next page.

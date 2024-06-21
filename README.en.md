@@ -6,6 +6,16 @@ OCR for Chinese PDF file using the API from [DayBreak-u/chineseocr\_lite](https:
 > <img src="assets/demo.png" alt="assets/demo.png" width="40%" height="40%">
 > <img src="assets/demo_web.png" alt="assets/demo_web.png" width="40%" height="40%">
 
+## Environment
+Python >= 3.8
+
+### Tested environment
+- x64 Windows 11
+  - Python 3.8.0
+  - Python 3.11.3
+- x64 Ubuntu 22.04.2
+  - Python 3.10.12
+
 ## Project directory structure
 - ```chineseocr_lite/```  
 Forked from the lightweight Chinese OCR model implemented by [DayBreak-u/chineseocr\_lite](https://github.com/DayBreak-u/chineseocr_lite).

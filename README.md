@@ -6,6 +6,16 @@
 > <img src="assets/demo.png" alt="assets/demo.png" width="40%" height="40%">
 > <img src="assets/demo_web.png" alt="assets/demo_web.png" width="40%" height="40%">
 
+## 环境要求
+Python >= 3.8
+
+### 测试环境
+- x64 Windows 11
+  - Python 3.8.0
+  - Python 3.11.3
+- x64 Ubuntu 22.04.2
+  - Python 3.10.12
+
 ## 项目目录结构
 - ```chineseocr_lite/```  
 引用自[DayBreak-u/chineseocr\_lite](https://github.com/DayBreak-u/chineseocr_lite)实现的轻量级中文OCR模型。

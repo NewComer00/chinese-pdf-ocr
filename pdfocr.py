@@ -46,6 +46,10 @@ class PdfOcrTool:
         return labeled_textbox
 
     def _text_cluster(self, page_img, ocr_results):
+        if len(ocr_results) == 0:
+            print("No OCR results found on current page.")
+            return {}
+
         line_heights = np.zeros(len(ocr_results))
         box_centers = np.zeros((len(ocr_results), 2))
         for idx, res in enumerate(ocr_results):
@@ -73,9 +77,8 @@ class PdfOcrTool:
 
         # do OCR results clustering by their positions
         labels = -np.ones(len(ocr_results), dtype=int)
-        contours.reverse(
-        )  # from the upper parts of the page to the lower parts
-        for cont_idx, cont in enumerate(contours):
+        # from the upper parts of the page to the lower parts
+        for cont_idx, cont in enumerate(reversed(contours)):
             for res_idx, res in enumerate(ocr_results):
                 # if the center of a OCR result box is inside some contour ...
                 if cv2.pointPolygonTest(cont, tuple(box_centers[res_idx]),
